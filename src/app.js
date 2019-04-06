@@ -103,6 +103,28 @@ app.post('/crearUsuario', (req,res) => {
 	}); 
 }); 
 
+app.get('/listarUsuarios', (req,res) => {
+	verificarAcceso(auth, '/listarUsuarios', res);
+
+/*	let listausuarios = servicioUsuario.mostrar();
+	res.render('listaUsuarios',{
+		listausuarios : listausuarios,
+		auth : auth
+	});*/
+
+	UsuarioMongo.find({},(err,respuesta)=>{
+		if (err){
+			return console.log(err)
+		}
+
+		res.render ('listaUsuarios',{
+			listausuarios : respuesta
+		})
+	})
+
+});
+
+
 app.post('/actualizarUsuario', (req,res) => {
 	verificarAcceso(auth, '/actualizarUsuario', res);
 	let mensajeError = servicioUsuario.actualizar(req.body.id,req.body.nombre,req.body.correo,req.body.telefono, req.body.rol);	
@@ -303,15 +325,7 @@ app.get('/listarmiscursos', (req,res) => {
 });
 
 
-app.get('/listarUsuarios', (req,res) => {
-	verificarAcceso(auth, '/listarUsuarios', res);
 
-	let listausuarios = servicioUsuario.mostrar();
-	res.render('listaUsuarios',{
-		listausuarios : listausuarios,
-		auth : auth
-	});
-});
 app.get('/eliminarmicurso', (req,res) => {
 	verificarAcceso(auth, '/eliminarmicurso', res);
 
