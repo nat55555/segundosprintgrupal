@@ -1,0 +1,42 @@
+{{>header}}
+
+<h1> Pagina para inscribirse a cursos de educacion continua </h1>
+
+
+<form action="/inscribirACurso" method="post">
+
+	{{#if auth}}
+
+				  <div class="form-group">
+						<label for="nombreuser">NOMBRE DEL USUARIO</label>
+						<select name="nombreuser" id="selec4">       
+						<option value="{{auth.id}}">{{auth.nombre}}</option>
+			         	</select>
+				  </div>
+
+
+				  <div class="form-group">
+						<label for="nombrecurso">NOMBRE DEL CURSO</label>
+						<select name="nombrecurso" id="select3">       
+			         {{#each listacursos}}	
+						<option value="{{this.id}}">{{this.nombre}}</option>
+			         {{/each}}
+			         	</select>
+				  </div>
+
+
+			<button>Inscribirse</button>
+			</form>
+			  
+
+			<div>
+			{{mensajeError}}
+			</div>	
+	{{else}}
+
+	<p> Es necesario estar registrado y loguearse para poder inscribirse a un curso  <a href="/login">LOGIN/REGISTRO</a> </p>
+
+	{{/if}}
+
+
+{{>footer}}

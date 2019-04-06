@@ -1,0 +1,60 @@
+
+{{>header}}
+
+<h1> Desinscripción a cursos de educacion continua </h1>
+
+
+<form action="/desinscribiracurso" method="post">
+
+	  <table>
+	  	<tr>
+	  		<td>
+	  			<div class="form-group">
+					<label for="nombreuser">NOMBRE DEL USUARIO</label>
+					<select name="nombreuser" id="selec4">       
+         			{{#each listausuarios}}	
+					<option value="{{this.id}}">{{this.nombre}}</option>
+        			 {{/each}}
+         			</select>
+	  			</div>
+	  		</td>
+	  		<td>
+	  			<div class="form-group">
+					<label for="nombrecurso">NOMBRE DEL CURSO</label>
+					<select name="nombrecurso" id="select3">       
+        			{{#each listacursos}}	
+					<option value="{{this.id}}">{{this.nombre}}</option>
+       				{{/each}}
+       		  		</select>
+	 			</div>
+
+	  		</td>
+	  		<td>
+	  			<button>Eliminar inscripción</button>
+	  		</td>
+	  	</tr>
+	  </table>
+
+</form>
+
+<div>
+{{mensajeError}}
+</div>	
+
+{{#each listainscritoslarge as |lista|}}	
+<table class="table table-striped">
+  <th colspan=6>{{lista.curso}} </th>	  
+  <tr>
+    <td>ID</td><td>NOMBRE</td><td>CORREO</td><td>TELEFONO</td><td>ROL</td>
+  </tr>
+    {{#each this.inscrito as |inscrito|}}
+        <tr>
+            <td>{{inscrito.id}}</td><td>{{inscrito.nombre}}</td><td>{{inscrito.correo}}</td><td>{{inscrito.telefono}}</td><td>{{inscrito.rol}}</td>
+        </tr>
+    {{/each}}
+</table>
+
+{{/each}}
+
+
+{{>footer}}

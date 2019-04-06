@@ -1,0 +1,50 @@
+{{>header}}
+
+<h1> Pagina crear curso </h1>
+
+
+<form action="/crear" method="post">
+	  <div class="form-group">
+			<label for="id">ID DEL CURSO</label>
+			<input type="number" name="id" required>
+	  </div>
+
+	  <div class="form-group">
+			<label for="nombre">NOMBRE DEL CURSO</label>
+			<input type="text" name="nombre" required>
+	  </div>
+
+	  <div class="form-group">
+			<label for="description">DESCRIPCION</label>
+			<input type="text" name="descripcion" required>
+	  </div>
+
+	  <div class="form-group">
+			<label for="valor">VALOR</label>
+			<input type="text" name="valor" required>
+	  </div>	  
+
+	  <div class="form-group">
+			<label for="modalidad">MODALIDAD</label>
+			<select name="modalidad" id="select1">
+			<option value="-">-</option>			
+			<option value="presencial">presencial</option>
+			<option value="virtual">virtual</option>
+			</select>
+	  </div>	
+
+	  <div class="form-group">
+			<label for="intensidad">INTENSIDAD HORARIA</label>
+			<input type="text" name="intensidad">
+	  </div>
+
+
+<button>Crear Curso</button>
+</form>
+
+
+<div>
+{{mensajeError}}
+</div>	
+
+{{>footer}}

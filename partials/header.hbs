@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Actividad 2</title>
+<!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+    crossorigin="anonymous"></head>
+<body>
+
+<nav class="navbar navbar-expand-sm bg-light">
+  <a class="navbar-brand" href="/">GestiónCursos</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav"
+    aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" href="listar">Ver cursos disponibles</a>   
+      </li>
+      {{#if auth.isAdmin }}
+      <li class="nav-item">
+        <a class="nav-link" href="listarinscritos">Ver inscritos</a>
+      </li>      
+      <li class="nav-item">
+        <a class="nav-link" href="crear">crear curso</a>
+      </li>      
+      </li>
+         <li class="nav-item">
+        <a class="nav-link" href="listarUsuarios">Listar Usuarios</a>
+      </li> 
+      <li class="nav-item">
+        <a class="nav-link" href="desinscribiracurso">Cancelar inscripción</a>
+      </li>   
+      <li class="nav-item">
+        <a class="nav-link" href="listarmiscursos">Mis cursos</a>         
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="listartodos">Ver todos los cursos</a>   
+      </li>            
+      {{/if}}
+      {{#if auth.isAspirante }}      
+      <li class="nav-item">
+        <a class="nav-link" href="listarmiscursos">Mis cursos</a>         
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="inscribirACurso">Inscribirse a un curso</a>
+      </li>      
+      {{/if}} 
+      {{#if auth.isEnSession }}  
+      <li class="nav-item">
+        <a class="nav-link" href="logout">Cerra Sesión</a>
+      </li>  
+      {{else}}
+      <li class="nav-item">
+        <a class="nav-link" href="login">Iniciar Sesión</a>
+      </li>  
+      {{/if}}      
+    </ul>
+  </div>
+</nav>

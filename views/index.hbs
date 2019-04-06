@@ -1,0 +1,17 @@
+{{>header}}
+
+
+
+{{#if auth}}
+
+<h1>Bienvenido {{auth.nombre}}</h1>
+
+{{else}}
+
+<p> Es necesario estar registrado para poder inscribirse a un curso  <a href="/crearUsuario">REGISTRO</a> </p>
+
+<p> Es necesario loguearse para poder consultar los cursos que ha matriculado  <a href="/login">LOGIN</a> </p>
+
+  {{/if}} 
+
+{{>footer}}

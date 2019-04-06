@@ -1,0 +1,20 @@
+{{>header}}
+
+
+<h1>  TODOS LOS CURSOS QUE SE HAN OFERTADO </h1>
+
+
+
+<table class="table table-striped">
+  <caption>CURSOS</caption>	
+  <tr>
+    <td>ID</td><td>NOMBRE</td><td>DESCRIPCIÓN</td><td>VALOR</td><td>DETALLE</td>
+  </tr>
+{{#each listacursos}}	
+  <tr>
+    <td>{{this.id}}</td><td>{{this.nombre}}</td><td>{{this.descripcion}}</td><td>{{this.valor}}</td><td><a href='detallecurso?id={{this.id}}' >ver </a></td>
+  </tr>
+{{/each}}
+</table>
+
+{{>footer}}

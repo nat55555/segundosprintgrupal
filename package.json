@@ -1,0 +1,41 @@
+{
+  "name": "actividad2",
+  "version": "1.0.0",
+  "description": "Segunda actividad del curso virtual",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Natalia Cardona",
+  "contributors": [
+    "Bayron Arenas",
+    "John Cardona",
+    "Fabian Gonzalez"
+  ],
+  "license": "ISC",
+  "dependencies": {
+    "body-parse": "^0.1.0",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "fs": "0.0.1-security",
+    "hbs": "^4.0.3",
+    "mongo": "^0.1.0",
+    "mongoose": "^5.4.22",
+    "mongoose-unique-validator": "^2.0.2",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nat55555/segundosprintgrupal.git"
+  },
+  "keywords": [
+    "express",
+    "nodejs",
+    "hbs"
+  ],
+  "bugs": {
+    "url": "https://github.com/nat55555/segundosprintgrupal/issues"
+  },
+  "homepage": "https://github.com/nat55555/segundosprintgrupal#readme"
+}

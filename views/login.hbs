@@ -1,0 +1,49 @@
+{{>header}}
+
+
+<div class="container login-container">
+ <div class="col-md-6 login-form-1">
+<p> Ingrese a la plataforma </p>
+
+<form action="login" method="post">
+  <div class="form-group">
+    <label>Documento de identidad</label>
+    <input
+      required
+      name="id"
+      type="text"
+      class="form-control {{#if errorMsg}}is-invalid{{/if}}"
+      value="{{this.value}}"
+    />
+
+<label>Clave</label>
+    <input
+      required
+      name="pass"
+      type="password"
+      class="form-control {{#if errorMsg}}is-invalid{{/if}}"
+      value="{{this.value}}"
+    />
+
+   
+  
+  <button type="submit" class="btn btn-primary">Ingresar</button>
+  <button onclick="location.href='crearUsuario'" type="button" class="btn btn-primary">
+        Registrarse</button>
+
+
+ 
+</div>
+</form>
+
+
+</div>
+</div>
+
+
+<div > {{errorMsg}}</div>
+
+
+
+
+{{>footer}}

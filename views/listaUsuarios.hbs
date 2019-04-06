@@ -1,0 +1,18 @@
+{{>header}}
+
+
+<table class="table table-striped">
+  <tr>
+    <td>ID</td><td>NOMBRE</td><td>CORREO</td><td>TELEFONO</td><td>ROL</td><td>DETALLE</td>
+  </tr>
+  {{#each listausuarios as |usuario|}}	
+        <tr>
+            <td>{{usuario.id}}</td><td>{{usuario.nombre}}</td><td>{{usuario.correo}}</td><td>{{usuario.telefono}}</td><td>{{usuario.rol}}</td><td><a href='crearUsuario?id={{usuario.id}}' >Editar </a></td>
+        </tr>
+{{/each}}
+</table>
+
+
+
+
+{{>footer}}
