@@ -26,6 +26,8 @@ hbs.registerPartials(directorioPartials);
 
 // requires para trabajar con mongoose
 const UsuarioMongo  = require('./models/usuarios');
+const CursoMongo  = require('./models/cursos');
+const InscripcionMongo  = require('./models/inscripciones');
 
 app.set('view engine', 'hbs');
 
@@ -67,12 +69,21 @@ app.get('/logout', (req,res) => {
 }); 
 
 app.get('/crearUsuario', (req,res) => {
-	let usuario = servicioUsuario.mostrardetall(req.query.id);
-	res.render('crearUsuario', {
-		usuario : usuario,
-		auth : auth
+	//let usuario = servicioUsuario.mostrardetall(req.query.id);
+
+		UsuarioMongo.findOne({id : req.query.id},(err,respuesta)=>{
+					if (err){
+						return console.log(err)
+				}
+
+
+				res.render('crearUsuario', {
+					usuario : respuesta,
+					auth : auth
+		});
 	});
 }); 
+
 
 app.post('/crearUsuario', (req,res) => {
 
@@ -106,11 +117,6 @@ app.post('/crearUsuario', (req,res) => {
 app.get('/listarUsuarios', (req,res) => {
 	verificarAcceso(auth, '/listarUsuarios', res);
 
-/*	let listausuarios = servicioUsuario.mostrar();
-	res.render('listaUsuarios',{
-		listausuarios : listausuarios,
-		auth : auth
-	});*/
 
 	UsuarioMongo.find({},(err,respuesta)=>{
 		if (err){
@@ -118,30 +124,45 @@ app.get('/listarUsuarios', (req,res) => {
 		}
 
 		res.render ('listaUsuarios',{
-			listausuarios : respuesta
+			listausuarios : respuesta,
+			auth : auth			
 		})
 	})
 
 });
 
 
+
 app.post('/actualizarUsuario', (req,res) => {
 	verificarAcceso(auth, '/actualizarUsuario', res);
-	let mensajeError = servicioUsuario.actualizar(req.body.id,req.body.nombre,req.body.correo,req.body.telefono, req.body.rol);	
-	if(mensajeError){
-		pagina = 'crearUsuario';
-			let usuario = servicioUsuario.mostrardetall(req.query.id);
 
-		res.render(pagina, {
-		usuario : usuario,
-		error : mensajeError,
-		auth : auth
-	});
-	}
-	else{
-		pagina = 'listarUsuarios';
-		res.redirect(pagina);
-	}
+
+	       //Estudiante.findById(req.session.usuario, (err, usuario) =>{
+			//UsuarioMongo.findById(req.id, (err, usuario) =>{
+
+			UsuarioMongo.findOneAndUpdate({id: req.body.id}, req.body , {new : true}, (err, resultados) =>{	
+					if (err){
+
+
+								res.render('crearUsuario', {
+								usuario : resultados,
+								error : err,
+								auth : auth
+							    });
+
+
+					}	else{
+
+						msg = 'Usuario ' + req.body.id + ' actualizado exitosamente';
+						res.render('crearUsuario', {
+								  	usuario : resultados,  // resultados es el valor que esta trayendo de la DB
+								  	auth : auth,
+								    error : msg
+						});
+			        }
+
+
+		     });
 
 	
 }); 
@@ -165,30 +186,34 @@ app.get('/crear', (req,res) => {
 
 app.post('/crear', (req,res) => {
 	verificarAcceso(auth, '/crear', res);
-	let curso = {
+
+
+		let cursoMongo = new CursoMongo ({
 		id: parseInt(req.body.id),		
 		nombre: req.body.nombre,
 		descripcion: req.body.descripcion,
 		valor: req.body.valor,					
 		modalidad: req.body.modalidad,	
 		intensidad: req.body.intensidad,	
-		estado: req.body.estado	
-	};
+		estado: req.body.estado		  
+	})
 
-	let msg = servicioCursos.crear(curso);	
-
-	//console.log(req.body);
-	res.render('crearcurso',{
-		id: parseInt(req.body.id),		
-		nombre: req.body.nombre,
-		descripcion: req.body.descripcion,
-		valor: req.body.valor,					
-		modalidad: req.body.modalidad,	
-		intensidad: req.body.intensidad,	
-		estado: req.body.estado	,
-		mensajeError : msg,
+	usuarioMongo.save((err, resultado) => {
+		if (err){
+			//msg = 'ya existe un usuario con esta identificacion';
+			//return err;
+			msg = err;
+			}	
+		else{
+		msg = 'Curso creado';
+	        }
+	 
+	    res.render('crearCurso', {
+		error : msg,
 		auth : auth
-		});	
+	    });	
+
+	}); 	
 
 }); 
 
