@@ -4,7 +4,11 @@
 <title>Actividad 2</title>
 <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
-    crossorigin="anonymous"></head>
+    crossorigin="anonymous">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+
+
+</head>
 <body>
 
 <nav class="navbar navbar-expand-sm bg-light">
@@ -58,4 +62,13 @@
       {{/if}}      
     </ul>
   </div>
+
+
+
+<div>
+  {{#if auth.isEnSession }}  
+      <i class="icon-user"><span style="color : #007bff"> Usuario : {{auth.nombre}}, Rol : {{auth.rol}} </span></i>
+      {{/if}}
+</div>
+
 </nav>
