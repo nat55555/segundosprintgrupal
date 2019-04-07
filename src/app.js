@@ -69,7 +69,6 @@ app.get('/logout', (req,res) => {
 }); 
 
 app.get('/crearUsuario', (req,res) => {
-	//let usuario = servicioUsuario.mostrardetall(req.query.id);
 
 		UsuarioMongo.findOne({id : req.query.id},(err,respuesta)=>{
 					if (err){
@@ -98,8 +97,6 @@ app.post('/crearUsuario', (req,res) => {
 
 	usuarioMongo.save((err, resultado) => {
 		if (err){
-			//msg = 'ya existe un usuario con esta identificacion';
-			//return err;
 			msg = err;
 			}	
 		else{
@@ -161,20 +158,44 @@ app.post('/actualizarUsuario', (req,res) => {
 						});
 			        }
 
-
 		     });
-
 	
 }); 
 
 
 app.get('/listar', (req,res) => {
 	verificarAcceso(auth, '/listar', res);
-	let listacursos = servicioCursos.mostrardisponibles();
-	res.render('listarcursos',{
-		listacursos : listacursos,
-		auth : auth
-	});
+	
+	//listar cursos disponibles
+	CursoMongo.find({'estado': 'disponible'},(err,respuesta)=>{
+		if (err){
+			return console.log(err)
+		}
+
+		res.render ('listarcursos',{
+			listacursos : respuesta,
+			auth : auth			
+		})
+	})
+
+});
+
+
+app.get('/listartodos', (req,res) => {
+	verificarAcceso(auth, '/listartodos', res);
+
+	//listar cursos disponibles
+	CursoMongo.find({},(err,respuesta)=>{
+		if (err){
+			return console.log(err)
+		}
+
+		res.render ('listarcursos',{
+			listacursos : respuesta,
+			auth : auth			
+		})
+	})
+
 });
 
 app.get('/crear', (req,res) => {
@@ -182,11 +203,11 @@ app.get('/crear', (req,res) => {
 	res.render('crearcurso', {
 		auth : auth
 	});
+
 }); 
 
 app.post('/crear', (req,res) => {
 	verificarAcceso(auth, '/crear', res);
-
 
 		let cursoMongo = new CursoMongo ({
 		id: parseInt(req.body.id),		
@@ -195,21 +216,19 @@ app.post('/crear', (req,res) => {
 		valor: req.body.valor,					
 		modalidad: req.body.modalidad,	
 		intensidad: req.body.intensidad,	
-		estado: req.body.estado		  
-	})
+		estado: 'disponible'		  
+	    })
 
-	usuarioMongo.save((err, resultado) => {
+	cursoMongo.save((err, resultado) => {
 		if (err){
-			//msg = 'ya existe un usuario con esta identificacion';
-			//return err;
 			msg = err;
 			}	
 		else{
-		msg = 'Curso creado';
+			msg = 'Curso ' + req.body.id + ' creado exitosamente';
 	        }
 	 
-	    res.render('crearCurso', {
-		error : msg,
+	    res.render('crearcurso', {
+		mensajeError : msg,
 		auth : auth
 	    });	
 
@@ -360,14 +379,6 @@ app.get('/eliminarmicurso', (req,res) => {
 }); 
 
 
-app.get('/listartodos', (req,res) => {
-	verificarAcceso(auth, '/listartodos', res);
-	let listacursos = servicioCursos.mostrar();
-	res.render('listarcursostodos',{
-		listacursos : listacursos,
-		auth : auth
-	});
-});
 
 app.get('*', (req,res) => {
 	res.render('index');
