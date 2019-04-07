@@ -239,7 +239,7 @@ app.get('/listartodos', (req,res) => {
 			return console.log(err)
 		}
 
-		res.render ('listarcursos',{
+		res.render ('listarcursostodos',{
 			listacursos : respuesta,
 			auth : req.session.auth			
 		})
@@ -286,32 +286,66 @@ app.post('/crear', (req,res) => {
 }); 
 
 app.get('/detallecurso', (req,res) => {
+
 	verificarAcceso(req.session.auth, '/detallecurso', res);
-	let curso = servicioCursos.mostrardetall(req.query.id);
-	res.render('detallecurso',{
-		curso : curso,
-		auth : req.session.auth
-	});
+
+	//listar detalle de 1 curso
+	CursoMongo.findOne({'id': req.query.id},(err,respuesta)=>{
+		if (err){
+			return console.log(err)
+		}
+
+		res.render ('detallecurso',{
+			curso : respuesta,
+			auth : req.session.auth			
+		})
+	})
+
+
 }); 
 
 
 app.get('/inscribirACurso', (req,res) => {
+
 	verificarAcceso(req.session.auth, '/inscribirACurso', res);
-	let listacursos = servicioCursos.mostrardisponibles();	
-	let listausuarios = servicioUsuario.mostrar();		
-	res.render('inscribirseCurso',{
-		listacursos : listacursos,
-		listausuarios: listausuarios,
-		auth : req.session.auth
-	});
+
+
+	//listar cursos disponibles
+	CursoMongo.find({'estado': 'disponible'},(err,respuestacursos)=>{
+		if (err){
+			return console.log(err)
+		}
+
+			let listacursos = respuestacursos;
+
+								UsuarioMongo.find({},(err,respuestausuarios)=>{
+									if (err){
+										return console.log(err)
+									}
+
+									let	listausuarios = respuestausuarios;
+
+													res.render('inscribirseCurso',{
+														listacursos : listacursos,
+														listausuarios: listausuarios,
+														auth : req.session.auth
+													});
+
+
+								})
+
+	})
+
+
+		
+
 }); 
 
 app.post('/inscribirACurso', (req,res) => {
 	verificarAcceso(req.session.auth, '/inscribirACurso', res);
 
 
-	let msg = servicioInscripcion.inscribirseCurso(parseInt(req.body.nombreuser),parseInt(req.body.nombrecurso));	
-
+/*	let msg = servicioInscripcion.inscribirseCurso(parseInt(req.body.nombreuser),parseInt(req.body.nombrecurso));	
 
 	let listacursos = servicioCursos.mostrardisponibles();	
 	res.render('inscribirseCurso',{
@@ -321,6 +355,70 @@ app.post('/inscribirACurso', (req,res) => {
 		mensajeError : msg,
 		auth : req.session.auth
 		});		
+
+		});	*/
+
+	InscripcionMongo.findOne({'curso': req.body.nombrecurso},(err,respuesta)=>{
+
+		let msg;
+		
+		if (err){
+			return console.log(err)
+		}
+
+				if(!respuesta){
+				  console.log ('noexiste registro de inscripcion para ese curso');
+
+									let inscripcionMongo = new InscripcionMongo ({
+									curso: parseInt(req.body.nombrecurso),		
+									usuarios: parseInt(req.body.nombreusuario)		  
+								    })
+
+								inscripcionMongo.save((err, resultado) => {
+									if (err){
+										msg = err;
+										}	
+									else{
+										msg = 'inscripcion de ' + req.body.nombreuser + ' creada exitosamente';
+								        }
+								})
+					
+
+
+				}
+				else{ 
+				  console.log ('SI HAY registro de inscripcion para ese curso');
+				  			InscripcionMongo.findOne({'curso': req.body.nombrecurso},{ 'usuarios': { "$in" : [req.body.nombreuser]} },(err,respuesta)=>{
+				  				if(respuesta){
+				  				 	msg = 'usuario ya esta matriculado en ese curso, no se puede matricular de nuevo'
+				  				}else {
+											InscripcionMongo.update(
+											    { 'curso': req.body.nombrecurso }, 
+											    { $push: { 'usuarios' : req.body.nombreuser} },
+											    done
+											);
+									msg = 'usuario matriculado exitosamente!!'												  						
+
+				  				}
+
+				  			})
+
+
+				}										
+
+
+	res.render('inscribirseCurso',{
+		//LIacursos : listacursos,
+		nombreuser: parseInt(req.body.nombreuser),		
+		nombrecurso: req.body.nombrecurso,
+		mensajeError : msg,
+		auth : req.session.auth
+		});
+	
+	})		
+
+			
+
 
 });
 
