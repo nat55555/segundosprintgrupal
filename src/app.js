@@ -81,6 +81,7 @@ app.post('/login', (req,res) => {
 								}else{
 									pagina = 'index';
 									let auth = {};
+									auth.id = respuesta.id;
 									auth.rol = respuesta.rol;
 									auth.nombre = respuesta.nombre;
 									auth.isAdmin = respuesta.rol == 'coordinador';
@@ -361,18 +362,21 @@ app.post('/inscribirACurso', (req,res) => {
 	InscripcionMongo.findOne({'curso': req.body.nombrecurso},(err,respuesta)=>{
 
 		let msg;
-		
+		let usuarios = [];
 		if (err){
 			return console.log(err)
 		}
-
+	
 				if(!respuesta){
 				  console.log ('noexiste registro de inscripcion para ese curso');
-
+				
+				  usuarios.push(  parseInt(req.body.nombreuser)	);
 									let inscripcionMongo = new InscripcionMongo ({
 									curso: parseInt(req.body.nombrecurso),		
-									usuarios: parseInt(req.body.nombreusuario)		  
+									usuarios: {}  
 								    })
+									inscripcionMongo.usuarios = {'usuarios' : usuarios };
+
 
 								inscripcionMongo.save((err, resultado) => {
 									if (err){
@@ -381,41 +385,68 @@ app.post('/inscribirACurso', (req,res) => {
 									else{
 										msg = 'inscripcion de ' + req.body.nombreuser + ' creada exitosamente';
 								        }
+							  				 	return res.render('inscribirseCurso',{
+												//LIacursos : listacursos,
+												nombreuser: parseInt(req.body.nombreuser),		
+												nombrecurso: req.body.nombrecurso,
+												mensajeError : msg,
+												auth : req.session.auth
+												});	
+
 								})
+
+								
 					
 
 
 				}
 				else{ 
 				  console.log ('SI HAY registro de inscripcion para ese curso');
-				  			InscripcionMongo.findOne({'curso': req.body.nombrecurso},{ 'usuarios': { "$in" : [req.body.nombreuser]} },(err,respuesta)=>{
+				  			//InscripcionMongo.findOne({'curso': req.body.nombrecurso, 'usuarios': { "$in" : [req.body.nombreuser]} },(err,respuesta)=>{
+				  			//InscripcionMongo.findOne(  { 'usuarios':  req.body.nombreuser } , (err,respuesta)=>{	
+				  			InscripcionMongo.findOne( { $and: [ { 'curso': req.body.nombrecurso }, { 'usuarios.usuarios': { "$in" : [parseInt(req.body.nombreuser)]} } ] } ,(err,respuesta)=>{	
+
+				  				
 				  				if(respuesta){
-				  				 	msg = 'usuario ya esta matriculado en ese curso, no se puede matricular de nuevo'
+				  				 	msg = 'usuario ya esta matriculado en ese curso, no se puede matricular de nuevo';
+				  				 	return res.render('inscribirseCurso',{
+									//LIacursos : listacursos,
+									nombreuser: parseInt(req.body.nombreuser),		
+									nombrecurso: req.body.nombrecurso,
+									mensajeError : msg,
+									auth : req.session.auth
+									});
+
+
 				  				}else {
-											InscripcionMongo.update(
-											    { 'curso': req.body.nombrecurso }, 
-											    { $push: { 'usuarios' : req.body.nombreuser} },
-											    done
-											);
-									msg = 'usuario matriculado exitosamente!!'												  						
+								    
+								    usuarios.push( parseInt(req.body.nombreuser)	);
+
+				  					InscripcionMongo.findOneAndUpdate({'curso': req.body.nombrecurso}, {$push: {'usuarios' : req.body.nombreuser}});
+									
+									msg = 'usuario matriculado exitosamente!!'		
+
+				  				 	return res.render('inscribirseCurso',{
+									//LIacursos : listacursos,
+									nombreuser: parseInt(req.body.nombreuser),		
+									nombrecurso: req.body.nombrecurso,
+									mensajeError : msg,
+									auth : req.session.auth
+									});																			  						
 
 				  				}
 
-				  			})
 
+
+				  			})
 
 				}										
 
 
-	res.render('inscribirseCurso',{
-		//LIacursos : listacursos,
-		nombreuser: parseInt(req.body.nombreuser),		
-		nombrecurso: req.body.nombrecurso,
-		mensajeError : msg,
-		auth : req.session.auth
-		});
+
+
 	
-	})		
+	});		
 
 			
 
