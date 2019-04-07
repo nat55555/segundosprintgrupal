@@ -12,6 +12,12 @@ const servicioUsuario = require('./servicios/servicioUsuario');
 const servicioCursos = require('./servicios/serviciodecursos');
 const servicioInscripcion = require('./servicios/servicioInscripcion');
 
+const session = require('express-session');
+
+const bcrypt = require('bcrypt');
+
+
+
 const directorioPublico = path.join(__dirname ,'../public');
 const directorioPartials = path.join(__dirname ,'../partials');
 const directorioHelpers = path.join(__dirname ,'../helpers');
@@ -21,6 +27,12 @@ app.use(bodyParser.urlencoded({extended : false}));
 
 app.use(express.static(directorioPublico));
 
+app.use(session({
+  secret: 'nodonode ultra secret',
+  resave: false,
+  saveUninitialized: true
+}));
+
 hbs.registerPartials(directorioPartials);
 //hbs.registerHelpers(directorioHelpers);
 
@@ -29,11 +41,17 @@ const UsuarioMongo  = require('./models/usuarios');
 const CursoMongo  = require('./models/cursos');
 const InscripcionMongo  = require('./models/inscripciones');
 
+
+const salt = 10;
+
+
+
+
+
+
+
 app.set('view engine', 'hbs');
 
-//usuario global, compartido por diferentes sessiones
-let auth = {};
- 
 
  app.get('/', (req,res) => {
 	res.render('index');
@@ -44,27 +62,57 @@ app.get('/login', (req,res) => {
 }); 
 
 app.post('/login', (req,res) => {
-    auth = servicioUsuario.login(req.body.id,req.body.pass);
 
-	let mensajeError;
-	if(auth){
-		pagina = 'index';
-		auth.isAdmin = auth.rol == 'coordinador';
-		auth.isAspirante = auth.rol == 'aspirante';
-		auth.isEnSession = true;
-	}
-	else{
-		pagina = 'login';
-		mensajeError = 'Identificacion o clave incorrectos';
-	}
-	res.render(pagina, {
-		errorMsg : mensajeError,
-		auth : auth
+    UsuarioMongo.findOne({id : req.body.id},(err,respuesta)=>{
+					if (err){
+						return console.log(err)
+					}else{
+
+							let mensajeError;
+							if(!respuesta){
+								pagina = 'login';
+								mensajeError = 'Identificacion o clave incorrectos';
+							}
+							else{
+
+								if(!bcrypt.compareSync(req.body.pass, respuesta.clave)){
+									pagina = 'login';
+									mensajeError = 'Identificacion o clave incorrectos';
+								}else{
+									pagina = 'index';
+									let auth = {};
+									auth.rol = respuesta.rol;
+									auth.nombre = respuesta.nombre;
+									auth.isAdmin = respuesta.rol == 'coordinador';
+									auth.isAspirante = respuesta.rol == 'aspirante';
+									auth.isEnSession = true;
+
+									req.session.auth = auth;
+								}
+								
+							}
+
+
+							res.render(pagina, {
+								errorMsg : mensajeError,
+								auth : req.session.auth
+							});
+
+
+					}
+
+
 	});
+
+	
 }); 
 
 app.get('/logout', (req,res) => {
-	auth = {};
+	req.session.destroy((err) => {
+		if(err){
+				console.log(err);
+		}
+	});
 	res.render('index');
 }); 
 
@@ -78,22 +126,23 @@ app.get('/crearUsuario', (req,res) => {
 
 				res.render('crearUsuario', {
 					usuario : respuesta,
-					auth : auth
+					auth : req.session.auth
 		});
 	});
 }); 
 
 
 app.post('/crearUsuario', (req,res) => {
-
 	let usuarioMongo = new UsuarioMongo ({
 	  	id: parseInt(req.body.id),		
 		nombre: req.body.nombre,
 		correo: req.body.correo,
 		telefono: req.body.telefono,					
-		clave: req.body.clave,	
+		clave: bcrypt.hashSync(req.body.clave,salt),	
 	    rol: 'aspirante'	  
 	})
+
+
 
 	usuarioMongo.save((err, resultado) => {
 		if (err){
@@ -105,14 +154,14 @@ app.post('/crearUsuario', (req,res) => {
 	 
 	    res.render('crearUsuario', {
 		error : msg,
-		auth : auth
+		auth : req.session.auth
 	    });	
 
 	}); 
 }); 
 
 app.get('/listarUsuarios', (req,res) => {
-	verificarAcceso(auth, '/listarUsuarios', res);
+	verificarAcceso(req.session.auth, '/listarUsuarios', res);
 
 
 	UsuarioMongo.find({},(err,respuesta)=>{
@@ -122,7 +171,7 @@ app.get('/listarUsuarios', (req,res) => {
 
 		res.render ('listaUsuarios',{
 			listausuarios : respuesta,
-			auth : auth			
+			auth : req.session.auth			
 		})
 	})
 
@@ -131,7 +180,7 @@ app.get('/listarUsuarios', (req,res) => {
 
 
 app.post('/actualizarUsuario', (req,res) => {
-	verificarAcceso(auth, '/actualizarUsuario', res);
+	verificarAcceso(req.session.auth, '/actualizarUsuario', res);
 
 
 	       //Estudiante.findById(req.session.usuario, (err, usuario) =>{
@@ -144,7 +193,7 @@ app.post('/actualizarUsuario', (req,res) => {
 								res.render('crearUsuario', {
 								usuario : resultados,
 								error : err,
-								auth : auth
+								auth : req.session.auth
 							    });
 
 
@@ -153,7 +202,7 @@ app.post('/actualizarUsuario', (req,res) => {
 						msg = 'Usuario ' + req.body.id + ' actualizado exitosamente';
 						res.render('crearUsuario', {
 								  	usuario : resultados,  // resultados es el valor que esta trayendo de la DB
-								  	auth : auth,
+								  	auth : req.session.auth,
 								    error : msg
 						});
 			        }
@@ -164,7 +213,7 @@ app.post('/actualizarUsuario', (req,res) => {
 
 
 app.get('/listar', (req,res) => {
-	verificarAcceso(auth, '/listar', res);
+	verificarAcceso(req.session.auth, '/listar', res);
 	
 	//listar cursos disponibles
 	CursoMongo.find({'estado': 'disponible'},(err,respuesta)=>{
@@ -174,7 +223,7 @@ app.get('/listar', (req,res) => {
 
 		res.render ('listarcursos',{
 			listacursos : respuesta,
-			auth : auth			
+			auth : req.session.auth			
 		})
 	})
 
@@ -182,7 +231,7 @@ app.get('/listar', (req,res) => {
 
 
 app.get('/listartodos', (req,res) => {
-	verificarAcceso(auth, '/listartodos', res);
+	verificarAcceso(req.session.auth, '/listartodos', res);
 
 	//listar cursos disponibles
 	CursoMongo.find({},(err,respuesta)=>{
@@ -192,22 +241,22 @@ app.get('/listartodos', (req,res) => {
 
 		res.render ('listarcursostodos',{
 			listacursos : respuesta,
-			auth : auth			
+			auth : req.session.auth			
 		})
 	})
 
 });
 
 app.get('/crear', (req,res) => {
-	verificarAcceso(auth, '/crear', res);
+	verificarAcceso(req.session.auth, '/crear', res);
 	res.render('crearcurso', {
-		auth : auth
+		auth : req.session.auth
 	});
 
 }); 
 
 app.post('/crear', (req,res) => {
-	verificarAcceso(auth, '/crear', res);
+	verificarAcceso(req.session.auth, '/crear', res);
 
 		let cursoMongo = new CursoMongo ({
 		id: parseInt(req.body.id),		
@@ -229,7 +278,7 @@ app.post('/crear', (req,res) => {
 	 
 	    res.render('crearcurso', {
 		mensajeError : msg,
-		auth : auth
+		auth : req.session.auth
 	    });	
 
 	}); 	
@@ -237,7 +286,8 @@ app.post('/crear', (req,res) => {
 }); 
 
 app.get('/detallecurso', (req,res) => {
-	verificarAcceso(auth, '/detallecurso', res);
+
+	verificarAcceso(req.session.auth, '/detallecurso', res);
 
 	//listar detalle de 1 curso
 	CursoMongo.findOne({'id': req.query.id},(err,respuesta)=>{
@@ -247,7 +297,7 @@ app.get('/detallecurso', (req,res) => {
 
 		res.render ('detallecurso',{
 			curso : respuesta,
-			auth : auth			
+			auth : req.session.auth			
 		})
 	})
 
@@ -256,7 +306,8 @@ app.get('/detallecurso', (req,res) => {
 
 
 app.get('/inscribirACurso', (req,res) => {
-	verificarAcceso(auth, '/inscribirACurso', res);
+
+	verificarAcceso(req.session.auth, '/inscribirACurso', res);
 
 
 	//listar cursos disponibles
@@ -277,7 +328,7 @@ app.get('/inscribirACurso', (req,res) => {
 													res.render('inscribirseCurso',{
 														listacursos : listacursos,
 														listausuarios: listausuarios,
-														auth : auth
+														auth : req.session.auth
 													});
 
 
@@ -291,7 +342,7 @@ app.get('/inscribirACurso', (req,res) => {
 }); 
 
 app.post('/inscribirACurso', (req,res) => {
-	verificarAcceso(auth, '/inscribirACurso', res);
+	verificarAcceso(req.session.auth, '/inscribirACurso', res);
 
 
 /*	let msg = servicioInscripcion.inscribirseCurso(parseInt(req.body.nombreuser),parseInt(req.body.nombrecurso));	
@@ -302,7 +353,9 @@ app.post('/inscribirACurso', (req,res) => {
 		nombreuser: parseInt(req.body.nombreuser),		
 		nombrecurso: req.body.nombrecurso,
 		mensajeError : msg,
-		auth : auth
+		auth : req.session.auth
+		});		
+
 		});	*/
 
 	InscripcionMongo.findOne({'curso': req.body.nombrecurso},(err,respuesta)=>{
@@ -359,7 +412,7 @@ app.post('/inscribirACurso', (req,res) => {
 		nombreuser: parseInt(req.body.nombreuser),		
 		nombrecurso: req.body.nombrecurso,
 		mensajeError : msg,
-		auth : auth
+		auth : req.session.auth
 		});
 	
 	})		
@@ -371,20 +424,20 @@ app.post('/inscribirACurso', (req,res) => {
 
 
 app.get('/listarinscritos', (req,res) => {
-	verificarAcceso(auth, '/listarinscritos', res);
+	verificarAcceso(req.session.auth, '/listarinscritos', res);
 	let listacursos = servicioCursos.mostrardisponibles();	
 	let listausuarios = servicioUsuario.mostrar();
 	let listainscritos = servicioInscripcion.mostrar();		
 	let listainscritoslarge = servicioInscripcion.mostrarinscritos();
 	res.render('listarinscritos',{
 		listainscritoslarge : listainscritoslarge,
-		auth : auth
+		auth : req.session.auth
 	});
 });
 
 
 app.get('/desinscribiracurso', (req,res) => {
-	verificarAcceso(auth, '/desinscribiracurso', res);
+	verificarAcceso(req.session.auth, '/desinscribiracurso', res);
 	let listacursos = servicioCursos.mostrardisponibles();	
 	let listausuarios = servicioUsuario.mostrar();
     let listainscritoslarge = servicioInscripcion.mostrarinscritos();
@@ -392,13 +445,13 @@ app.get('/desinscribiracurso', (req,res) => {
 		listacursos : listacursos,
 		listausuarios: listausuarios,
 		listainscritoslarge : listainscritoslarge,
-		auth : auth
+		auth : req.session.auth
 	});
 });
 
 
 app.post('/desinscribiracurso', (req,res) => {
-	verificarAcceso(auth, '/desinscribiracurso', res);
+	verificarAcceso(req.session.auth, '/desinscribiracurso', res);
 	let msg = servicioInscripcion.eliminar(parseInt(req.body.nombreuser),parseInt(req.body.nombrecurso));	
 	let listacursos = servicioCursos.mostrardisponibles();	
 	let listausuarios = servicioUsuario.mostrar();
@@ -414,7 +467,7 @@ app.post('/desinscribiracurso', (req,res) => {
 		listacursos : listacursos,
 		listausuarios: listausuarios,
 		listainscritoslarge : listainscritoslarge,
-		auth : auth
+		auth : req.session.auth
 		});	
 	},4000)
 		
@@ -422,7 +475,7 @@ app.post('/desinscribiracurso', (req,res) => {
 });
 
 app.get('/cerrarcurso', (req,res) => {	
-	verificarAcceso(auth, '/cerrarcurso', res);
+	verificarAcceso(req.session.auth, '/cerrarcurso', res);
 
 	let curso = servicioCursos.cerrarcurso(req.query.id);
 	let listainscritoslarge = servicioInscripcion.mostrarinscritos();					
@@ -435,7 +488,7 @@ app.get('/cerrarcurso', (req,res) => {
 
 
 app.get('/eliminarinscripcion', (req,res) => {
-	verificarAcceso(auth, '/eliminarinscripcion', res);
+	verificarAcceso(req.session.auth, '/eliminarinscripcion', res);
 
 	let eliminarinscripcion = servicioInscripcion.eliminar();
 	let curso = servicioInscripcion.eliminar(req.query.iduser,req.query.idcurso);
@@ -448,24 +501,24 @@ app.get('/eliminarinscripcion', (req,res) => {
 }); 
 
 app.get('/listarmiscursos', (req,res) => {
-	verificarAcceso(auth, '/listarmiscursos', res);
+	verificarAcceso(req.session.auth, '/listarmiscursos', res);
 
-	console.log('auth.id:'+auth.id)
-	console.log('auth.nombre:'+auth.nombre)
-	console.log('auth.role:'+auth.role)
-	console.log('auth.isAdmin:'+auth.isAdmin)
+	console.log('auth.id:'+req.session.auth.id)
+	console.log('auth.nombre:'+req.session.auth.nombre)
+	console.log('auth.role:'+req.session.auth.role)
+	console.log('auth.isAdmin:'+req.session.auth.isAdmin)
 
 	let listacursosusuario=servicioInscripcion.mostarmiscursos(auth.id);
 	res.render('listarmiscursos',{
 		listacursosusuario : listacursosusuario,
-		auth : auth
+		auth : req.session.auth
 	});
 });
 
 
 
 app.get('/eliminarmicurso', (req,res) => {
-	verificarAcceso(auth, '/eliminarmicurso', res);
+	verificarAcceso(req.session.auth, '/eliminarmicurso', res);
 
 	let eliminarinscripcion = servicioInscripcion.eliminar();
 	let curso = servicioInscripcion.eliminar(req.query.iduser,req.query.idcurso);
