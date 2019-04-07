@@ -370,12 +370,12 @@ app.post('/inscribirACurso', (req,res) => {
 				if(!respuesta){
 				  console.log ('noexiste registro de inscripcion para ese curso');
 				
-				  usuarios.push(  parseInt(req.body.nombreuser)	);
+				  usuarios.push(  req.body.nombreuser	);
 									let inscripcionMongo = new InscripcionMongo ({
 									curso: parseInt(req.body.nombrecurso),		
-									usuarios: {}  
+									usuarios: usuarios  
 								    })
-									inscripcionMongo.usuarios = {'usuarios' : usuarios };
+									//inscripcionMongo.usuarios = {'usuarios' : usuarios };
 
 
 								inscripcionMongo.save((err, resultado) => {
@@ -404,7 +404,7 @@ app.post('/inscribirACurso', (req,res) => {
 				  console.log ('SI HAY registro de inscripcion para ese curso');
 				  			//InscripcionMongo.findOne({'curso': req.body.nombrecurso, 'usuarios': { "$in" : [req.body.nombreuser]} },(err,respuesta)=>{
 				  			//InscripcionMongo.findOne(  { 'usuarios':  req.body.nombreuser } , (err,respuesta)=>{	
-				  			InscripcionMongo.findOne( { $and: [ { 'curso': req.body.nombrecurso }, { 'usuarios.usuarios': { "$in" : [parseInt(req.body.nombreuser)]} } ] } ,(err,respuesta)=>{	
+				  			InscripcionMongo.findOne( { $and: [ { 'curso': req.body.nombrecurso }, { 'usuarios': { $in : [req.body.nombreuser]} } ] } ,(err,respuesta)=>{	
 
 				  				
 				  				if(respuesta){
@@ -420,11 +420,19 @@ app.post('/inscribirACurso', (req,res) => {
 
 				  				}else {
 								    
-								    usuarios.push( parseInt(req.body.nombreuser)	);
+		
 
-				  					InscripcionMongo.findOneAndUpdate({'curso': req.body.nombrecurso}, {$push: {'usuarios' : req.body.nombreuser}});
+				  					//InscripcionMongo.findOneAndUpdate({'curso': req.body.nombrecurso}, {$push: {'usuarios' : req.body.nombreuser}});
 									
-									msg = 'usuario matriculado exitosamente!!'		
+									InscripcionMongo.findOneAndUpdate({'curso': req.body.nombrecurso}, 
+									                    {$push: {'usuarios': 
+									                    req.body.nombreuser}}, 
+									                    {new: true}, (err, result) => {
+									                    		
+									                   })									
+
+									msg = 'usuario matriculado exitosamente!!'
+											
 
 				  				 	return res.render('inscribirseCurso',{
 									//LIacursos : listacursos,

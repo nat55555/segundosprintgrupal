@@ -10,7 +10,7 @@ const inscripcionSchema = new Schema({
 		unique: true  // valida que no haya un registro para ese curso
 	},
 	usuarios :{
-		type : { usuarios: [Number] },
+		type : { usuarios: [String] },
 		required : true
 	}
 });
