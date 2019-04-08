@@ -346,19 +346,6 @@ app.post('/inscribirACurso', (req,res) => {
 	verificarAcceso(req.session.auth, '/inscribirACurso', res);
 
 
-/*	let msg = servicioInscripcion.inscribirseCurso(parseInt(req.body.nombreuser),parseInt(req.body.nombrecurso));	
-
-	let listacursos = servicioCursos.mostrardisponibles();	
-	res.render('inscribirseCurso',{
-		listacursos : listacursos,
-		nombreuser: parseInt(req.body.nombreuser),		
-		nombrecurso: req.body.nombrecurso,
-		mensajeError : msg,
-		auth : req.session.auth
-		});		
-
-		});	*/
-
 	InscripcionMongo.findOne({'curso': req.body.nombrecurso},(err,respuesta)=>{
 
 		let msg;
@@ -464,15 +451,155 @@ app.post('/inscribirACurso', (req,res) => {
 
 app.get('/listarinscritos', (req,res) => {
 	verificarAcceso(req.session.auth, '/listarinscritos', res);
-	let listacursos = servicioCursos.mostrardisponibles();	
+	/*let listacursos = servicioCursos.mostrardisponibles();	
 	let listausuarios = servicioUsuario.mostrar();
 	let listainscritos = servicioInscripcion.mostrar();		
 	let listainscritoslarge = servicioInscripcion.mostrarinscritos();
 	res.render('listarinscritos',{
 		listainscritoslarge : listainscritoslarge,
 		auth : req.session.auth
-	});
-});
+	});*/
+
+		//listar inscripciones disponibles
+
+					/*			InscripcionMongo.aggregate([
+								//	{
+								//		$unwind: "$usuarios"
+								//	}, {
+								//		$group: {
+								//			"_id": '$usuarios'
+								//		}
+								//	}, 
+										//level-2 :titles 
+										{ $lookup: { 
+											from: 'CursoMongo', 
+											localField: 'curso', 
+											foreignField: 'id', 
+											as: 'cursosjoin' }    
+										},
+										
+																					//level-3 : issues
+										{ $lookup: { 
+												from: 'UsuarioMongo', 
+												localField: 'usuarios', 
+												foreignField: 'id', 
+												as: 'usuariosjoin'},
+										},
+										{
+												$unwind: "$usuarios"
+										},																													
+										{"$project":
+										{
+											"curso": 1,
+											"usuariosjoin": {
+												"nombre": 1,
+												"coreo": 1
+												}
+										}
+										}										
+										//,
+										//{$group: {_id:'curso'}}//,
+										//{
+										//		$unwind: "$usuariosjoin"
+										//},											
+    									//{ $unwind:"$CursoMongo", preserveNullAndEmptyArrays: true }, 
+										//{$project: {'_id':0, idcurso: "$cursos.id", nombrecurso: "$cursos.nombre"}}
+										//{$project: {'_id':0, idcurso: 1, nombrecurso: 1}}
+
+										//, 
+										//{
+										//	$unwind: '$cursos'
+										//}//,
+										//{
+										//	
+										//		$match: {
+										//			  'cursos.estado': 'disponible'
+										//		}
+											  
+										//}
+										//,
+
+								])
+							.exec(function (err, results)
+						{
+								if (err) return res.status(500).send("There was a problem finding the Issues.");
+								if (!results) return res.status(404).send("No Issues found.");
+								return console.log (results)
+								return console.log ('reg'+ registro)
+
+								res.render ('listarinscritos',{
+									listainscritoslarge : results,
+									auth : req.session.auth	
+
+							}) */
+	
+
+						
+				//-----------
+
+			   
+	//			   });
+
+	InscripcionMongo.find( {} ,(err,respuesta)=>{
+		let rta = [];
+		
+			if(err || !respuesta){
+				return console.log("errorrrrrrrrrr");
+			}
+			let fil = {};
+			respuesta.forEach(fila => {
+			
+				let cursoId = fila.curso;
+
+				CursoMongo.findOne({'id': cursoId},(err,curso)=>{
+					let inscrito = [];
+					if (err){
+						return console.log(err)
+					}
+			
+					if(curso && curso.estado == 'disponible'){
+						
+							fila.usuarios.forEach( usuarioId => {
+								
+								UsuarioMongo.findOne({id: usuarioId}, (err, usuario) =>{
+									console.log("rta =" + rta);
+								
+
+									inscrito.push(usuario);						
+									
+								}	
+								
+
+								);
+							})
+							
+					}
+
+					fil = {"curso" : curso.nombre, "idcurso" : curso.id, "inscrito" : inscrito};
+							console.log("--------"+inscrito);
+							rta.push(fil);
+				})
+				
+			})
+
+			
+
+
+			//
+			res.render ('listarinscritos',{
+				listainscritoslarge : rta,
+				auth : req.session.auth	
+		
+			})				
+			
+	}	
+	);
+
+
+			
+			});
+	
+
 
 
 app.get('/desinscribiracurso', (req,res) => {
