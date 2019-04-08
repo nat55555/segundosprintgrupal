@@ -33,6 +33,10 @@ const cursoSchema = new Schema({
 	estado : {
 		type: String,
 		required : true					
+	},
+	iddocente : {
+		type : Number,
+		trim : true
 	}
 });
 

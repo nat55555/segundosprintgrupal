@@ -669,16 +669,57 @@ app.get('/eliminarinscripcion', (req,res) => {
 app.get('/listarmiscursos', (req,res) => {
 	verificarAcceso(req.session.auth, '/listarmiscursos', res);
 
-	console.log('auth.id:'+req.session.auth.id)
-	console.log('auth.nombre:'+req.session.auth.nombre)
-	console.log('auth.role:'+req.session.auth.role)
-	console.log('auth.isAdmin:'+req.session.auth.isAdmin)
+	//**********************
+	let listaincripciones = [];
+	let miscursoslist=[];
+	let cursosidlist=[];
+	let usuarioslist= [];
+	InscripcionMongo.find({},(err,respuestainscripciones)=>{
+		console.log('===============');
+		if(err){
+			return console.log(err)
+		}else{
+			listaincripciones = respuestainscripciones;
+			listaincripciones.forEach(function(element) {
+	  			usuarioslist=element.usuarios;
+	  			usuarioslist.forEach(function(usuariocurso){
+	  				if(usuariocurso==req.session.auth.id){
+	  					cursosidlist.push(element.curso)
+	  					console.log('buscando curso: '+element.curso)
+						CursoMongo.findOne({'id': element.curso},(err,respuestacursos)=>{
+							if(err){
+								return console.log(err)
+							}else{
+								miscursoslist.push(respuestacursos);
+							}
+						});
+	  				}
+	  			});
+			});
 
-	let listacursosusuario=servicioInscripcion.mostarmiscursos(auth.id);
-	res.render('listarmiscursos',{
-		listacursosusuario : listacursosusuario,
-		auth : req.session.auth
+		
+			console.log('esta es la lista de los cursos ========')
+			console.log('xxxxxxxx'+miscursoslist);
+			res.render('listarmiscursos',{
+			listacursosusuario : miscursoslist,
+			auth : req.session.auth
+			});
+
+		}
+		/*setTimeout(function() {
+			res.render('listarmiscursos',{
+			listacursosusuario : miscursoslist,
+			auth : req.session.auth
+			});
+		},4000)*/
+		
+
 	});
+
+	//**********************
+
+	//let listacursosusuario=servicioInscripcion.mostarmiscursos(auth.id);
+	
 });
 
 
