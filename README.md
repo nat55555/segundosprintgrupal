@@ -13,6 +13,7 @@ Para usar el sistema debe contar con los siguientes programas instalados en su e
 - Git
 - NodeJs
 - NPM
+- Mongoose
 
 Para obtener el codigo fuente el comando es :
 
