@@ -640,16 +640,79 @@ app.post('/desinscribiracurso', (req,res) => {
 
 });
 
+
 app.get('/cerrarcurso', (req,res) => {	
 	verificarAcceso(req.session.auth, '/cerrarcurso', res);
 
-	let curso = servicioCursos.cerrarcurso(req.query.id);
-	let listainscritoslarge = servicioInscripcion.mostrarinscritos();					
+	//let curso = servicioCursos.cerrarcurso(req.query.id);
+	//let listainscritoslarge = servicioInscripcion.mostrarinscritos();					
 	//res.render('listarinscritos',{
 	//	listainscritoslarge : listainscritoslarge,
 	//	auth : auth
 	//});
-	res.redirect('listarinscritos');
+
+
+	CursoMongo.findOne({'id': req.query.id},(err,cursoacerrar)=>{
+		if (err){
+			return console.log(err)
+		}
+
+						UsuarioMongo.find({'rol': 'docente'},(err,respuestadocentes)=>{
+							if (err){
+								return console.log(err)
+							}
+								console.log(respuestadocentes)
+								res.render ('cerrarcurso',{
+									curso : cursoacerrar,
+									listadocentes : respuestadocentes,
+									auth : req.session.auth			
+								})
+						})			
+
+
+	})
+
+
+}); 
+
+app.post('/cerrarcurso', (req,res) => {	
+	verificarAcceso(req.session.auth, '/cerrarcurso', res);
+	console.log('curso:'+req.body.nombrecurso)
+	console.log('docente:'+req.body.nombredocente)
+
+    CursoMongo.updateOne( { 'id' : parseInt(req.body.nombrecurso)}, { $push: { 'iddocente' : parseInt(req.body.nombredocente) } }, (err,respuestadocen)=>{
+    	console.log('asignando docente')
+    	if (err){
+			return console.log(err)
+		}else{
+			console.log('respuestadocen:'+respuestadocen)
+		}
+
+    });
+
+
+
+	CursoMongo.findOne({'id': req.query.id},(err,cursoacerrar)=>{
+		if (err){
+			return console.log(err)
+		}
+
+						UsuarioMongo.find({'rol': 'docente'},(err,respuestadocentes)=>{
+							if (err){
+								return console.log(err)
+							}
+								console.log(respuestadocentes)
+								res.render ('cerrarcurso',{
+									curso : cursoacerrar,
+									listadocentes : respuestadocentes,
+									auth : req.session.auth			
+								})
+						})			
+
+
+	})
+
+
 }); 
 
 
@@ -669,13 +732,11 @@ app.get('/eliminarinscripcion', (req,res) => {
 app.get('/listarmiscursos', (req,res) => {
 	verificarAcceso(req.session.auth, '/listarmiscursos', res);
 
-	//**********************
 	let listaincripciones = [];
 	let miscursoslist=[];
-	let cursosidlist=[];
 	let usuarioslist= [];
+
 	InscripcionMongo.find({},(err,respuestainscripciones)=>{
-		console.log('===============');
 		if(err){
 			return console.log(err)
 		}else{
@@ -684,8 +745,6 @@ app.get('/listarmiscursos', (req,res) => {
 	  			usuarioslist=element.usuarios;
 	  			usuarioslist.forEach(function(usuariocurso){
 	  				if(usuariocurso==req.session.auth.id){
-	  					cursosidlist.push(element.curso)
-	  					console.log('buscando curso: '+element.curso)
 						CursoMongo.findOne({'id': element.curso},(err,respuestacursos)=>{
 							if(err){
 								return console.log(err)
@@ -696,40 +755,72 @@ app.get('/listarmiscursos', (req,res) => {
 	  				}
 	  			});
 			});
-
 		
-			console.log('esta es la lista de los cursos ========')
-			console.log('xxxxxxxx'+miscursoslist);
-			res.render('listarmiscursos',{
-			listacursosusuario : miscursoslist,
-			auth : req.session.auth
-			});
+			setTimeout(function() {
+				res.render('listarmiscursos',{
+				listacursosusuario : miscursoslist,
+				auth : req.session.auth
+				});
+			},2000);
 
 		}
-		/*setTimeout(function() {
-			res.render('listarmiscursos',{
-			listacursosusuario : miscursoslist,
-			auth : req.session.auth
-			});
-		},4000)*/
+		
 		
 
 	});
 
-	//**********************
-
-	//let listacursosusuario=servicioInscripcion.mostarmiscursos(auth.id);
-	
 });
 
 
 
 app.get('/eliminarmicurso', (req,res) => {
 	verificarAcceso(req.session.auth, '/eliminarmicurso', res);
+	console.log('***  eliminarmicurso')
+	console.log('***  curso:'+req.query.idcurso+' usuario:'+req.session.auth.id.toString())
+	console.log('***  eliminarmicurso')
 
-	let eliminarinscripcion = servicioInscripcion.eliminar();
-	let curso = servicioInscripcion.eliminar(req.query.iduser,req.query.idcurso);
-	res.redirect('listarmiscursos');
+	let listaincripciones = [];
+	let miscursoslist=[];
+	let usuarioslist= [];
+	// eliminado curso
+	    InscripcionMongo.updateOne( { 'curso' : req.query.idcurso}, { $pull: { 'usuarios' : req.session.auth.id.toString() } }, (err,respuestapull)=>{
+    	console.log('eliminando');
+    	if(err){
+			return console.log(err)
+		}else{
+			console.log('=============== respuestapull'+respuestapull);
+
+			InscripcionMongo.find({},(err,respuestainscripciones)=>{
+				if(err){
+					return console.log(err)
+				}else{
+					listaincripciones = respuestainscripciones;
+					listaincripciones.forEach(function(element) {
+			  			usuarioslist=element.usuarios;
+			  			usuarioslist.forEach(function(usuariocurso){
+			  				if(usuariocurso==req.session.auth.id){
+								CursoMongo.findOne({'id': element.curso},(err,respuestacursos)=>{
+									if(err){
+										return console.log(err)
+									}else{
+										miscursoslist.push(respuestacursos);
+									}
+								});
+			  				}
+			  			});
+					});
+				
+					setTimeout(function() {
+						res.render('listarmiscursos',{
+						listacursosusuario : miscursoslist,
+						auth : req.session.auth
+						});
+					},2000);
+
+				}
+			});
+		}
+    });
 }); 
 
 

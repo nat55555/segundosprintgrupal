@@ -5,16 +5,16 @@
 
 <form action="/cerrarcurso" method="post">
 				  <div class="form-group">
-						<label for="nombreuser">CURSO</label>
-						<select name="nombreuser" id="selec4">       
+						<label for="nombrecurso">CURSO</label>
+						<select name="nombrecurso" id="selec4">       
 						<option value="{{curso.id}}">{{curso.nombre}}</option>
 			         	</select>
 				  </div>
 
 
 				  <div class="form-group">
-						<label for="nombrecurso">PROFESOR A ASIGNAR</label>
-						<select name="nombrecurso" id="select3">       
+						<label for="nombredocente">PROFESOR A ASIGNAR</label>
+						<select name="nombredocente" id="select3">       
 			         {{#each listadocentes}}	
 						<option value="{{this.id}}">{{this.nombre}}</option>
 			         {{/each}}
