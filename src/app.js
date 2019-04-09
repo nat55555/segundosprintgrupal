@@ -543,54 +543,75 @@ app.get('/listarinscritos', (req,res) => {
 	InscripcionMongo.find( {} ,(err,respuesta)=>{
 		let rta = [];
 		
-			if(err || !respuesta){
+			if(err){
 				return console.log("errorrrrrrrrrr");
 			}
+
+			if(respuesta){
+
 			let fil = {};
 			respuesta.forEach(fila => {
 			
 				let cursoId = fila.curso;
 
-				CursoMongo.findOne({'id': cursoId},(err,curso)=>{
+				CursoMongo.findOne({$and: [{'id': cursoId},{'estado': 'disponible'}]},(err,curso)=>{
 					let inscrito = [];
 					if (err){
 						return console.log(err)
 					}
 			
-					if(curso && curso.estado == 'disponible'){
+					if(curso){
 						
 							fila.usuarios.forEach( usuarioId => {
 								
 								UsuarioMongo.findOne({id: usuarioId}, (err, usuario) =>{
+
+												if(err){
+													return console.log("errorrrrrrrrrr");
+												}
+
 									console.log("rta =" + rta);
 								
+									if(usuario){
+									inscrito.push(usuario);	
+								      /*  fil = {"curso" : curso.nombre, "idcurso" : curso.id, "inscrito" : inscrito};
+										console.log("--------"+inscrito);
+										rta.push(fil);*/
 
-									inscrito.push(usuario);						
+									}else {
+
+									}					
 									
 								}	
 								
 
 								);
 							})
+
+							fil = {"curso" : curso.nombre, "idcurso" : curso.id, "inscrito" : inscrito};
+							console.log("--------"+inscrito);
+							rta.push(fil);
 							
 					}
 
-					fil = {"curso" : curso.nombre, "idcurso" : curso.id, "inscrito" : inscrito};
+					/* fil = {"curso" : curso.nombre, "idcurso" : curso.id, "inscrito" : inscrito};
 							console.log("--------"+inscrito);
-							rta.push(fil);
+							rta.push(fil);*/
 				})
 				
 			})
 
+				res.render ('listarinscritos',{
+				listainscritoslarge : rta,
+				auth : req.session.auth			
+			})		
 			
+			} // FIN IF RESPUESTA
+
 
 
 			//
-			res.render ('listarinscritos',{
-				listainscritoslarge : rta,
-				auth : req.session.auth	
 		
-			})				
 			
 	}	
 	);
@@ -679,13 +700,15 @@ app.post('/cerrarcurso', (req,res) => {
 	verificarAcceso(req.session.auth, '/cerrarcurso', res);
 	console.log('curso:'+req.body.nombrecurso)
 	console.log('docente:'+req.body.nombredocente)
+	let msg;
 
-    CursoMongo.updateOne( { 'id' : parseInt(req.body.nombrecurso)}, { $push: { 'iddocente' : parseInt(req.body.nombredocente) } }, (err,respuestadocen)=>{
+    CursoMongo.updateOne( { 'id' : parseInt(req.body.nombrecurso)}, { 'iddocente' : parseInt(req.body.nombredocente), 'estado' : 'cerrado' } , (err,respuestadocen)=>{
     	console.log('asignando docente')
     	if (err){
 			return console.log(err)
 		}else{
 			console.log('respuestadocen:'+respuestadocen)
+									msg = 'curso cerrado exitosamente!!, se asigno el docente' + req.body.nombredocente
 		}
 
     });
@@ -705,6 +728,7 @@ app.post('/cerrarcurso', (req,res) => {
 								res.render ('cerrarcurso',{
 									curso : cursoacerrar,
 									listadocentes : respuestadocentes,
+									mensajeError : msg,
 									auth : req.session.auth			
 								})
 						})			
