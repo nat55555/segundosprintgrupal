@@ -86,6 +86,7 @@ app.post('/login', (req,res) => {
 									auth.nombre = respuesta.nombre;
 									auth.isAdmin = respuesta.rol == 'coordinador';
 									auth.isAspirante = respuesta.rol == 'aspirante';
+									auth.isDocente = respuesta.rol == 'docente';									
 									auth.isEnSession = true;
 
 									req.session.auth = auth;
@@ -600,11 +601,12 @@ app.get('/listarinscritos', (req,res) => {
 				})
 				
 			})
-
-				res.render ('listarinscritos',{
-				listainscritoslarge : rta,
-				auth : req.session.auth			
-			})		
+				setTimeout(function() {   
+					res.render ('listarinscritos',{
+					listainscritoslarge : rta,
+					auth : req.session.auth			
+					})
+				 },2000);		
 			
 			} // FIN IF RESPUESTA
 
@@ -745,12 +747,88 @@ app.get('/eliminarinscripcion', (req,res) => {
 
 	let eliminarinscripcion = servicioInscripcion.eliminar();
 	let curso = servicioInscripcion.eliminar(req.query.iduser,req.query.idcurso);
-	let listainscritoslarge = servicioInscripcion.mostrarinscritos();					
-	/*res.render('listarinscritos',{
-		listainscritoslarge : listainscritoslarge,
-		auth : auth
-	});*/
-	res.redirect('listarinscritos');
+	let listainscritoslarge = servicioInscripcion.mostrarinscritos();	
+    
+    InscripcionMongo.updateOne( { 'curso' : req.query.idcurso}, { $pull: { 'usuarios' : req.query.iduser.toString() } }, (err,respuestapull)=>{
+		if(err){
+			return console.log(err)
+		}else{
+			//*********************
+				InscripcionMongo.find( {} ,(err,respuesta)=>{
+					let rta = [];
+		
+					if(err){
+						return console.log("errorrrrrrrrrr");
+					}
+
+					if(respuesta){
+
+						let fil = {};
+						respuesta.forEach(fila => {
+			
+							let cursoId = fila.curso;
+
+							CursoMongo.findOne({$and: [{'id': cursoId},{'estado': 'disponible'}]},(err,curso)=>{
+								let inscrito = [];
+								if (err){
+									return console.log(err)
+								}
+				
+								if(curso){
+							
+									fila.usuarios.forEach( usuarioId => {
+									
+										UsuarioMongo.findOne({id: usuarioId}, (err, usuario) =>{
+
+											if(err){
+												return console.log("errorrrrrrrrrr");
+											}
+
+											console.log("rta =" + rta);
+									
+											if(usuario){
+											inscrito.push(usuario);	
+									      /*  fil = {"curso" : curso.nombre, "idcurso" : curso.id, "inscrito" : inscrito};
+											console.log("--------"+inscrito);
+											rta.push(fil);*/
+
+											}else {
+
+											}					
+										
+										});
+									})
+
+									fil = {"curso" : curso.nombre, "idcurso" : curso.id, "inscrito" : inscrito};
+									console.log("--------"+inscrito);
+									rta.push(fil);
+								
+								}
+
+								/* fil = {"curso" : curso.nombre, "idcurso" : curso.id, "inscrito" : inscrito};
+								console.log("--------"+inscrito);
+								rta.push(fil);*/
+							})// fin CursoMongo.findOne
+				
+						})//---------
+					setTimeout(function() {    	
+						res.render ('listarinscritos',{
+						listainscritoslarge : rta,
+						auth : req.session.auth			
+						})
+					},2000);			
+			
+					} // FIN IF RESPUESTA
+				});
+
+
+			//*************			
+			
+			} 
+		
+		
+	});
+
 }); 
 
 app.get('/listarmiscursos', (req,res) => {
@@ -762,7 +840,7 @@ app.get('/listarmiscursos', (req,res) => {
 
 	InscripcionMongo.find({},(err,respuestainscripciones)=>{
 		if(err){
-			return console.log(err)
+			 console.log(err)
 		}else{
 			listaincripciones = respuestainscripciones;
 			listaincripciones.forEach(function(element) {
@@ -771,7 +849,7 @@ app.get('/listarmiscursos', (req,res) => {
 	  				if(usuariocurso==req.session.auth.id){
 						CursoMongo.findOne({'id': element.curso},(err,respuestacursos)=>{
 							if(err){
-								return console.log(err)
+								 console.log(err)
 							}else{
 								miscursoslist.push(respuestacursos);
 							}
@@ -847,10 +925,96 @@ app.get('/eliminarmicurso', (req,res) => {
     });
 }); 
 
+app.get('/test', (req,res) => {
+	verificarAcceso(req.session.auth, '/test', res);
+		res.render('test',{
+		auth : req.session.auth
+		});
+	});
+
+app.get('/listarcursosdocente', (req,res) => {
+	verificarAcceso(req.session.auth, '/listarcursosdocente', res);	
+
+		//*********************
+		InscripcionMongo.find( {} ,(err,respuesta)=>{
+			let rta = [];
+
+			if(err){
+				return console.log("errorrrrrrrrrr");
+			}
+
+			if(respuesta){
+
+				let fil = {};
+				respuesta.forEach(fila => {
+	
+					let cursoId = fila.curso;
+
+					console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaa ----------------------------->>>'+req.session.auth.id);
+					let idDocente = req.session.auth.id;
+
+					CursoMongo.findOne({$and: [{'id': cursoId},{'iddocente': idDocente},{'estado': 'cerrado'}]},(err,curso)=>{
+						let inscrito = [];
+						if (err){
+							return console.log(err)
+						}
+		
+						if(curso){
+					
+							fila.usuarios.forEach( usuarioId => {
+							
+								UsuarioMongo.findOne({id: usuarioId}, (err, usuario) =>{
+
+									if(err){
+										return console.log("errorrrrrrrrrr");
+									}
+
+									console.log("rta =" + rta);
+							
+									if(usuario){
+									inscrito.push(usuario);	
+							      /*  fil = {"curso" : curso.nombre, "idcurso" : curso.id, "inscrito" : inscrito};
+									console.log("--------"+inscrito);
+									rta.push(fil);*/
+
+									}else {
+
+									}					
+								
+								});
+							})
+
+							fil = {"curso" : curso.nombre, "idcurso" : curso.id, "inscrito" : inscrito};
+							console.log("--------"+inscrito);
+							rta.push(fil);
+						
+						}
+
+					})// 
+		
+				});//---------
+		
+	
+			} // FIN IF RESPUESTA
+
+				setTimeout(function() {    	
+				res.render ('listarinscritos',{
+				listainscritoslarge : rta,
+				auth : req.session.auth			
+				})
+			},2000);	
+		});
+
+
+	//*************			
+			
+}); 
 
 
 app.get('*', (req,res) => {
-	res.render('index');
+	res.render('index', {
+		auth: req.session.auth
+	});
 });
 
 

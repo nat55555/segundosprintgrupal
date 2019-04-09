@@ -11,6 +11,7 @@ const rolCoordinador = 'coordinador';
 
 const recursosxrol = [
 	{rol : 'interesado', recursos : ['/listar','/detallecurso', '/crearUsuario']},
+	{rol : 'docente', recursos : ['/listar','/listarcursosdocente']},	
 	{rol : 'aspirante' , recursos : ['/listar','/listarmiscursos','/inscribirACurso', '/crearUsuario', '/eliminarmicurso']}
 ];
 

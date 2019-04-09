@@ -4,7 +4,7 @@
   "description": "Tercera actividad del curso virtual de NodeJS del Tecnológico de Antioquia",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/app.js"
   },
   "author": "Natalia Cardona",
   "contributors": [
@@ -30,9 +30,6 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nat55555/segundosprintgrupal.git"
-  },
-  "scripts": {
-    "start": "node src/app.js"
   },
   "keywords": [
     "express",

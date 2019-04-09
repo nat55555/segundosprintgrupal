@@ -20,40 +20,45 @@
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav">
       <li class="nav-item">
-        <a class="nav-link" href="listar">Ver cursos disponibles</a>   
+        <a class="nav-link" href="listar">Ver cursos Disponibles</a>   
+      </li>   
+      {{#if auth.isDocente }}        
+      <li class="nav-item">
+        <a class="nav-link" href="listarcursosdocente">Cusos docente</a>
       </li>
+      {{/if}}
       {{#if auth.isAdmin }}
       <li class="nav-item">
-        <a class="nav-link" href="listarinscritos">Ver inscritos</a>
-      </li>      
+        <a class="nav-link" href="listartodos">Ver Todos Los Cursos</a>   
+      </li>       
       <li class="nav-item">
-        <a class="nav-link" href="crear">crear curso</a>
+        <a class="nav-link" href="crear">Crear Curso</a>
       </li>      
       </li>
          <li class="nav-item">
         <a class="nav-link" href="listarUsuarios">Listar Usuarios</a>
       </li> 
       <li class="nav-item">
+        <a class="nav-link" href="listarinscritos">Ver inscritos</a>
+      </li>           
+      <li class="nav-item">
         <a class="nav-link" href="desinscribiracurso">Cancelar inscripción</a>
       </li>   
       <li class="nav-item">
         <a class="nav-link" href="listarmiscursos">Mis cursos</a>         
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="listartodos">Ver todos los cursos</a>   
-      </li>            
+      </li> 
       {{/if}}
       {{#if auth.isAspirante }}      
       <li class="nav-item">
-        <a class="nav-link" href="listarmiscursos">Mis cursos</a>         
+        <a class="nav-link" href="inscribirACurso">Inscribirse a un curso</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="inscribirACurso">Inscribirse a un curso</a>
-      </li>      
+        <a class="nav-link" href="listarmiscursos">Mis cursos</a>         
+      </li>           
       {{/if}} 
       {{#if auth.isEnSession }}  
       <li class="nav-item">
-        <a class="nav-link" href="logout">Cerra Sesión</a>
+        <a class="nav-link" href="logout">Cerrar Sesión</a>
       </li>  
       {{else}}
       <li class="nav-item">
