@@ -31,6 +31,9 @@
     "type": "git",
     "url": "git+https://github.com/nat55555/segundosprintgrupal.git"
   },
+  "scripts": {
+    "start": "node src/app.js"
+  },
   "keywords": [
     "express",
     "nodejs",
