@@ -1,7 +1,7 @@
 {
   "name": "actividad2",
   "version": "1.0.0",
-  "description": "Segunda actividad del curso virtual",
+  "description": "Tercera actividad del curso virtual de NodeJS del Tecnológico de Antioquia",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
