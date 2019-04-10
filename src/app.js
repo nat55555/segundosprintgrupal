@@ -627,40 +627,93 @@ app.get('/listarinscritos', (req,res) => {
 
 app.get('/desinscribiracurso', (req,res) => {
 	verificarAcceso(req.session.auth, '/desinscribiracurso', res);
-	let listacursos = servicioCursos.mostrardisponibles();	
-	let listausuarios = servicioUsuario.mostrar();
+	let listacursos = [];	
+	let listausuarios =[];
     let listainscritoslarge = servicioInscripcion.mostrarinscritos();
-    res.render('desinscribircurso',{
-		listacursos : listacursos,
-		listausuarios: listausuarios,
-		listainscritoslarge : listainscritoslarge,
-		auth : req.session.auth
+
+ 	UsuarioMongo.find({},(err,respuesta)=>{
+		if (err){
+			return console.log(err)
+		}else{
+			listausuarios = respuesta;
+			console.log('buscando usuario:'+listausuarios)
+
+			//listar cursos disponibles
+			CursoMongo.find({},(err,respuestacursos)=>{
+				if (err){
+					return console.log(err)
+				}
+					listacursos = respuestacursos;
+					console.log('buscando cursos:'+respuesta)
+			});
+		
+			setTimeout(function() {    
+				console.log('en el render')
+				console.log('buscando listausuarios:'+listausuarios)
+				console.log('buscando cursos:'+listacursos)
+			    res.render('desinscribircurso',{
+					listacursos : listacursos,
+					listausuarios: listausuarios,
+					listainscritoslarge : listainscritoslarge,
+					auth : req.session.auth
+				});
+			},2000);
+		}	
 	});
+
 });
 
 
 app.post('/desinscribiracurso', (req,res) => {
 	verificarAcceso(req.session.auth, '/desinscribiracurso', res);
-	let msg = servicioInscripcion.eliminar(parseInt(req.body.nombreuser),parseInt(req.body.nombrecurso));	
-	let listacursos = servicioCursos.mostrardisponibles();	
-	let listausuarios = servicioUsuario.mostrar();
-	let listainscritos = servicioInscripcion.mostrar();
+	let msg = ' ';	
+	let listacursos = [];	
+	let listausuarios =[];
+    let listainscritoslarge = servicioInscripcion.mostrarinscritos();
+    console.log('req.body.nombreuser:'+req.body.nombreuser);
+    console.log('req.body.nombrecurso'+req.body.nombrecurso);
 
-	setTimeout(function() {
-		console.log('probando el tiempo en post 2')
-		let listainscritoslarge = servicioInscripcion.mostrarinscritos();
-		res.render('desinscribircurso',{
-		nombreuser: parseInt(req.body.nombreuser),		
-		nombrecurso: req.body.nombrecurso,
-		mensajeError : msg,
-		listacursos : listacursos,
-		listausuarios: listausuarios,
-		listainscritoslarge : listainscritoslarge,
-		auth : req.session.auth
-		});	
-	},4000)
-		
+	InscripcionMongo.updateOne( { 'curso' : req.body.nombrecurso}, { $pull: { 'usuarios' : req.body.nombreuser } }, (err,respuestapull)=>{
+		if(err){
+			msg='No se puedo realizar el procedimineto'
+		}{
+			msg='se elimino el curso correctamente'
+			UsuarioMongo.find({},(err,respuesta)=>{
+				if (err){
+					return console.log(err)
+				}else{
+					listausuarios = respuesta;
+					console.log('buscando usuario:'+listausuarios)
 
+					//listar cursos disponibles
+					CursoMongo.find({},(err,respuestacursos)=>{
+						if (err){
+							return console.log(err)
+						}
+							listacursos = respuestacursos;
+							console.log('buscando cursos:'+respuesta)
+					});
+				
+					setTimeout(function() {    
+						console.log('en el render')
+						console.log('buscando listausuarios:'+listausuarios)
+						console.log('buscando cursos:'+listacursos)
+						let listainscritoslarge = servicioInscripcion.mostrarinscritos();
+					    res.render('desinscribircurso',{
+							nombreuser: parseInt(req.body.nombreuser),		
+							nombrecurso: req.body.nombrecurso,
+							mensajeError : msg,
+							listacursos : listacursos,
+							listausuarios: listausuarios,
+							listainscritoslarge : listainscritoslarge,
+							auth : req.session.auth
+						});
+					},2000);
+				}	
+			});
+
+		}
+	});
 });
 
 
