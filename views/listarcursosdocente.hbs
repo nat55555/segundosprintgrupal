@@ -2,13 +2,20 @@
 
 {{#each listainscritoslarge as |lista|}}	
 <table class="table table-striped">
-  <th colspan=6>{{lista.curso}} <a href='cerrarcurso?id={{lista.idcurso}}' >Cerrar Curso</a></th>	  
+  <th colspan=6>{{lista.curso}}
+  	{{lista.descripcion}}
+  	  modalidad= {{lista.modalidad}}
+  	  intensidad horaria={{lista.intensidad}}
+  	  estado del curso={{lista.estado}}
+  	  (id={{lista.idcurso}})
+
+  </th>	  
   <tr>
-    <td>ID</td><td>NOMBRE</td><td>CORREO</td><td>TELEFONO</td><td>ROL</td><td>DETALLE</td>
+    <td>ID</td><td>NOMBRE</td><td>CORREO</td><td>TELEFONO</td><td>ROL</td>
   </tr>
     {{#each this.inscrito as |inscrito|}}
         <tr>
-            <td>{{inscrito.id}}</td><td>{{inscrito.nombre}}</td><td>{{inscrito.correo}}</td><td>{{inscrito.telefono}}</td><td>{{inscrito.rol}}</td><td><a href='eliminarinscripcion?iduser={{inscrito.id}}&idcurso={{lista.idcurso}}' >eliminar inscripcion </a></td>
+            <td>{{inscrito.id}}</td><td>{{inscrito.nombre}}</td><td>{{inscrito.correo}}</td><td>{{inscrito.telefono}}</td><td>{{inscrito.rol}}</td>
         </tr>
     {{/each}}
 </table>
