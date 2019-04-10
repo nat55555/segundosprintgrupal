@@ -1038,7 +1038,8 @@ app.get('/listarcursosdocente', (req,res) => {
 								});
 							})
 
-							fil = {"curso" : curso.nombre, "idcurso" : curso.id, "inscrito" : inscrito};
+							fil = {"curso" : curso.nombre, "descripcion" : curso.descripcion, "modalidad" : curso.modalidad,
+								   "intensidad" : curso.intensidad,"estado" : curso.estado, "idcurso" : curso.id, "inscrito" : inscrito};
 							console.log("--------"+inscrito);
 							rta.push(fil);
 						

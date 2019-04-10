@@ -2,7 +2,14 @@
 
 {{#each listainscritoslarge as |lista|}}	
 <table class="table table-striped">
-  <th colspan=6>{{lista.curso}}</th>	  
+  <th colspan=6>{{lista.curso}}
+  	{{lista.descripcion}}
+  	  modalidad= {{lista.modalidad}}
+  	  intensidad horaria={{lista.intensidad}}
+  	  estado del curso={{lista.estado}}
+  	  (id={{lista.idcurso}})
+
+  </th>	  
   <tr>
     <td>ID</td><td>NOMBRE</td><td>CORREO</td><td>TELEFONO</td><td>ROL</td>
   </tr>
