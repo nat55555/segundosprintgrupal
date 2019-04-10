@@ -199,7 +199,18 @@ app.post('/actualizarUsuario', (req,res) => {
 							    });
 
 
-					}	else{
+					}	
+
+
+					if (!resultados){
+						msg = 'El usuario con ID ' + req.body.id + ' no existe en el sistema, no se puede actualizar!';
+						res.render('crearUsuario', {
+								  	usuario : resultados,  // resultados es el valor que esta trayendo de la DB
+								  	auth : req.session.auth,
+								    error : msg
+						});						
+					}
+					else{
 
 						msg = 'Usuario ' + req.body.id + ' actualizado exitosamente';
 						res.render('crearUsuario', {

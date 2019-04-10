@@ -8,6 +8,14 @@
 <form action="{{#if usuario.id}}actualizarUsuario{{else}}crearUsuario{{/if}}" method="post">
   <div class="form-group">
     <label>Documento de identidad</label>
+
+    {{#if usuario.id}}
+          <div class="form-group">
+            <select name="id">       
+            <option value="{{usuario.id}}">{{usuario.id}}</option>
+            </select>
+          </div>
+    {{else}}
     <input
       required
       name="id"
@@ -15,7 +23,7 @@
       class="form-control {{#if error}}is-invalid{{/if}}"
       value="{{usuario.id}}"
     />
-
+    {{/if}}
     <label>Nombre</label>
     <input
       required
