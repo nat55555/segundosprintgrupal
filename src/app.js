@@ -1013,7 +1013,8 @@ app.get('/listarcursosdocente', (req,res) => {
 						}
 		
 						if(curso){
-					
+							console.log('====================================================================')
+							console.log(curso)
 							fila.usuarios.forEach( usuarioId => {
 							
 								UsuarioMongo.findOne({id: usuarioId}, (err, usuario) =>{
@@ -1051,11 +1052,11 @@ app.get('/listarcursosdocente', (req,res) => {
 			} // FIN IF RESPUESTA
 
 				setTimeout(function() {    	
-				res.render ('listarinscritos',{
+				res.render ('listarcursosdocente',{
 				listainscritoslarge : rta,
 				auth : req.session.auth			
 				})
-			},2000);	
+			},4000);	
 		});
 
 

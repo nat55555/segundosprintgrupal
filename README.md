@@ -106,6 +106,8 @@ Historia de usuario # 6
 			   allí  se muestran todos los inscriptos y adicionalmente tendrá 2 opciones
 			   Opcción 1.  Frente al nombre de cada curso aparece el link "Cerrar Curso"  para cerrar el curso.
 			   Opcción 2.  Frente a cada aspirante inscripto aparece el link "Eliminar Inscripcion"  para borrar a un                                              candidato al curso.
+			4. al lado de cado del nombre de cada curso esta el boton de cerrar, el cual direcciona al formulario para  
+			   cerrar curso, donde se podra seleccionar al docente que se asignara al curso.
 
 
 Historia de usuario # 7
@@ -134,3 +136,13 @@ Historia de usuario # 8
 			B. Una vez realizado los cambios, se debe dar click en el boton "actualizar". Tenga en cuenta que no esta permitido modificar la identificacion o la clave del usuario. 
 		  Opcion 2: En la opción de "Editar Usuario", también podrá acceder a modificar el campo "rol" que cuenta con los valores "aspirante" y "docente".
 				  				  
+
+Historia de usuario # 8
+	"Yo como docente necesito gestionar los cursos que están a mi cargo para poder obtener
+	información del mismo y de los estudiantes."
+
+	procedimiento de ejecucion:
+		1. Ingresar a la aplicación en la url: http://localhost:3000/
+		2. Loguearse como con un perfil de docente
+		3. en la barra de menu selecinar "Cusos docente"
+
