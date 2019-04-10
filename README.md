@@ -1,4 +1,4 @@
-# Actividad 2 curso virtual de NodeJs
+# Actividad 3 curso virtual de NodeJs
 
 Este proyecto es una aplicación web que permite gestionar cursos con base al rol del usuario. De esta forma:
 
@@ -17,7 +17,7 @@ Para usar el sistema debe contar con los siguientes programas instalados en su e
 
 Para obtener el codigo fuente el comando es :
 
-	git clone https://github.com/nat55555/actividadsemana2.git
+	git clone https://github.com/nat55555/segundosprintgrupal
 	
 Una vez descargue el proyecto, dirijase al directorio "actividadsemana2" y ejecute el siguiente comando
 
@@ -143,6 +143,6 @@ Historia de usuario # 8
 
 	procedimiento de ejecucion:
 		1. Ingresar a la aplicación en la url: http://localhost:3000/
-		2. Loguearse como con un perfil de docente
-		3. en la barra de menu selecinar "Cusos docente"
+		2. Loguearse con un perfil de docente
+		3. En la barra de menú, seleccionar la opción "Cusos docente"
 
