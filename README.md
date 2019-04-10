@@ -5,6 +5,7 @@ Este proyecto es una aplicación web que permite gestionar cursos con base al ro
 - Interesado cualquier usuario que acceda al sistema, este puede visualizar que cursos estan disponibles y una descripción de dicho curso.
 - Aspirante usuario que se ha registrado en el sistema, este puede ademas inscribirse a un curso, ver en que cursos esta inscrito y desincribirse.
 - Coordinador usuario del sistema con privilegios para crear cursos, cerrar cursos, desincribir a usuarios de cursos
+- Docente usuario con perfil de docente, que puede asignarse como docente de un curso
 
 # Como usar la aplicación
 
@@ -35,8 +36,6 @@ Finalmente, para iniciar el programa ejecute el comando:
 - Puede crear un nuevo usuario con rol aspirante en la opción "Registrarme"
 - La aplicacion tambien cuenta con algunos cursos y usuarios creados para facilitar las pruebas
 - **La funcionalidad de "login" sirve para identificar el usuario que esta usando la aplicacion con base al rol que este tenga podra acceder a ciertas opciones del menu.
-Tenga presente que este login solo tiene el proposito de permitir verificar ciertos aspectos de las historias y no es un "login" en el sentido estricto de la palabra, es decir,
-no se tienen encuenta casos como sesión con usuarios concurrentes o expiración de sesión.**
 
 
 # Historias de Usuario
@@ -57,6 +56,8 @@ Historia de usuario # 1
 		9. Loguearse como coordinador (user:1 pass:admin) para verificar las opciones disponibles para el coordinador.
 		10. Los usuarios de rol coordinador pueden ver los cursos disponibles en la opción "Ver cursos disponibles".
 		11. Los usuarios de rol coordinador pueden visualizar todos los cursos (disponibles y cerrados) a través de la opción "Ver todos los cursos".
+		12. Los usuarios de rol docente podrán visualizar la información de los cursos que se les asignaron.
+		NOTA: El nombre del usuario y el rol podrá verse en la parte superior derecho de la pantalla.
  
 Historia de usuario # 2
 	"como coordinador necesito crear cursos de educación continua para ser divulgados entre posibles
