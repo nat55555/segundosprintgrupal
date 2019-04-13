@@ -138,7 +138,7 @@ Historia de usuario # 8
 		  Opcion 2: En la opción de "Editar Usuario", también podrá acceder a modificar el campo "rol" que cuenta con los valores "aspirante" y "docente".
 				  				  
 
-Historia de usuario # 8
+Historia de usuario # 9
 	"Yo como docente necesito gestionar los cursos que están a mi cargo para poder obtener
 	información del mismo y de los estudiantes."
 
